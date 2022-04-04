@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\RegisterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,7 +40,7 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("", name="security_register", methods={"GET|POST"})
+     * @Route("/inscription", name="security_register", methods={"GET|POST"})
      * 
      */
 
