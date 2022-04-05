@@ -10,7 +10,7 @@ class DefaultController extends AbstractController
 {
 
     /** 
-     * @Route("/", name="default_home", methods={"GET"})
+     * @Route("/", name="default_home", methods={"GET|POST"})
      * @return Response
      */
    public function home(): Response{
