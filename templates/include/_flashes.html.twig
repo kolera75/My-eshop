@@ -13,6 +13,6 @@
             {% endif %}
             <span class="alert-inner--text"><strong>{{ label is same as 'granted' ? 'Redirigé' : label is same as 'warning' ? 'Remarque' : label is same as 'success' ? 'Succès' : label|title}} : </strong> {{ message|raw }}</span>
         </div>
-
+ 
     {% endfor %}
 {% endfor %}
