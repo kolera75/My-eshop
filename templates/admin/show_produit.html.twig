@@ -55,9 +55,9 @@
 					<td>
 
 
-						<a href="{{path('show_produit')}}" class="text-center align-middle" title="Voir le produit"><i class="fa-solid fa-eye"></i></a>
+					<a href="{{path('show_produit')}}" class="text-center align-middle" title="Voir le produit"><i class="fa-solid fa-eye"></i></a>
                     <a href="{{ path('update_produit', {'id': produit.id } ) }}" class="text-center align-middle" title="Modifier le produit"><i class="fa-solid fa-edit"></i></a>
-                    <a href="" class="text-center align-middle" title="Archiver le produit"><i class="fa-solid fa-trash"></i></a>
+                    <a href="{{ path('soft_delete_produit', {'id': produit.id } ) }}" class="text-center align-middle text-danger" onclick="return confirm('Voulez-vous archiver ce produit ?\n Si oui, Il sera off-line')" title="Archiver le produit"><i class="fa-solid fa-trash"></i></a>
 
 
 					</td>
