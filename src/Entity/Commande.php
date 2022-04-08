@@ -51,7 +51,7 @@ class Commande
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity=Produit::class, mappedBy="commande")
+     * @ORM\OneToMany(targetEntity=Produit::class, mappedBy="commande", cascade={"persist"})
      */
     private $products;
 
