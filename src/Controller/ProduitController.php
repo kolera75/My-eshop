@@ -46,16 +46,13 @@ class ProduitController extends AbstractController
             $produit->setCreatedAt(new DateTime());
             $produit->setUpdatedAt(new DateTime());
 
+            /** @var UploadedFile $photo */
             $photo = $form->get('photo')->getData();
 
             if($photo) {
-
-               // méthode créer par nous même pour réutiliser cette partie de code
-
+                // Méthode créée par nous-même pour réutiliser cette partie de code
                 $this->handleFile($produit, $photo, $slugger);
-
-
-            } 
+            }
 
             $entityManager->persist($produit);
             $entityManager->flush();
@@ -74,7 +71,6 @@ class ProduitController extends AbstractController
      */
     public function updateProduit(Produit $produit, EntityManagerInterface $entityManager, Request $request, SluggerInterface $slugger): Response
     {
-    
         $originalPhoto = $produit->getPhoto();
 
         $form = $this->createForm(ProduitType::class, $produit, [
@@ -86,15 +82,12 @@ class ProduitController extends AbstractController
             $produit->setUpdatedAt(new DateTime());
 
             $photo = $form->get('photo')->getData();
-        
-            if($photo){
 
+            if($photo) {
+                // Méthode créée par nous-même pour réutiliser cette partie de code
                 $this->handleFile($produit, $photo, $slugger);
-
             }
-
             else {
-
                 $produit->setPhoto($originalPhoto);
             }
 
@@ -107,71 +100,73 @@ class ProduitController extends AbstractController
 
         return $this->render('admin/form/form_produit.html.twig', [
             'form' => $form->createView(),
-            'produit' => $produit, 
+            'produit' => $produit,
         ]);
     }
 
 
-///////////////////////////////////////////////////////////////// PRIVATE FUNCTION /////////////////////////////////////////////////////////////
 
-private function handleFile(Produit $produit, UploadedFile $photo, SluggerInterface $slugger)
-{
+    ///////////////////////////////////////////////////////////////// PRIVATE FUNCTION /////////////////////////////////////////////////////////////
 
-    $extension = '.' . $photo->guessExtension();
-                $safeFilename = $slugger->slug($produit->getTitle());
+    /**
+     * @param Produit $produit
+     * @param UploadedFile $photo
+     * @param SluggerInterface $slugger
+     * @return void
+     */
+    private function handleFile(Produit $produit, UploadedFile $photo, SluggerInterface $slugger): void
+    {
+        # guessExtension() devine l'extension du fichier À PARTIR du MimeType du fichier
+        #   => rappel : NE PAS confondre extension ET MimeType !
+        $extension = '.' . $photo->guessExtension();
 
-                $newFilename = $safeFilename . '_' . uniqid() . $extension;
+        $safeFilename = $slugger->slug($produit->getTitle());
 
-                try {
-                    $photo->move($this->getParameter('uploads_dir'), $newFilename);
-                    $produit->setPhoto($newFilename);
-                } catch (FileException $exception) {
-                    $this->addFlash('warning', 'La photo du produit ne s\'est pas importée avec succès. Veuillez réessayer en modifiant le produit.');
-//                    return $this->redirectToRoute('show_produit');
-                } // end catch()
+        $newFilename = $safeFilename . '_' . uniqid() . $extension;
 
-               
-
-}
-
+        try {
+            $photo->move($this->getParameter('uploads_dir'), $newFilename);
+            $produit->setPhoto($newFilename);
+        } catch (FileException $exception) {
+            $this->addFlash('warning', 'La photo du produit ne s\'est pas importée avec succès. Veuillez réessayer en modifiant le produit.');
+        } // end catch()
+    }
 
     /**
      * @Route("/archiver-un-produit/{id}", name="soft_delete_produit", methods={"GET"})
+     * @param Produit $produit
+     * @param EntityManagerInterface $entityManager
+     * @return Response
      */
-    public function softDeleteProduit(Produit $produit, EntityManagerInterface $entityManager): Response 
+    public function softDeleteProduit(Produit $produit, EntityManagerInterface $entityManager): Response
     {
-
-
-        //setDeletedAt() nous permet de créer une bascule(on/off) sur le produit pour afficher en ligne ou le mettre dans la poubelle
-            # CEPENDANT ! En BDD la ligne existe toujours, ce n'est pas supprimé
+        // setDeletedAt() nous permet de créer une bascule (on/off) sur le produit pour afficher en ligne ou le mettre dans la poubelle.
+            # CEPENDANT ! En BDD la ligne existe toujours, l'objet Produit n'est pas supprimé.
         $produit->setDeletedAt(new DateTime());
 
         $entityManager->persist($produit);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Le produit ' . $produit->getTitle() . 'a bien été archivé.');
+        $this->addFlash('success', "Le produit " . $produit->getTitle() ." a bien été archivé.");
         return $this->redirectToRoute('show_produit');
-
-
     }
-
 
     /**
      * @Route("/restaurer-un-produit/{id}", name="restore_produit", methods={"GET"})
+     * @param Produit $produit
+     * @param EntityManagerInterface $entityManager
+     * @return Response
      */
     public function restoreProduit(Produit $produit, EntityManagerInterface $entityManager): Response
     {
-        // côté miroir de la bascule(on/off) qui permet dde restaurer en ligne le produit.
+        // côté miroir de la bascule (on/off) qui permet de restaurer en ligne le Produit.
         $produit->setDeletedAt(null);
-
 
         $entityManager->persist($produit);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Le produit ' . $produit->getTitle() . 'a bien été restauré.');
+        $this->addFlash('success', "Le produit " . $produit->getTitle() ." a bien été restauré.");
         return $this->redirectToRoute('show_produit');
-
     }
-
 
 }
